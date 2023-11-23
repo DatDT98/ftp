@@ -1,4 +1,4 @@
-# ftp
+# Funds Transfer Pricing
 Funds transfer pricing
 HO is as funds transfer pricing
 LOAN, DEPOSIT and BUSINESS deparment
