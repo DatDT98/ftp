@@ -1,0 +1,10 @@
+CREATE TABLE units (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    capital INTEGER NOT NULL
+);
+
+CREATE TABLE ftp (
+    id SERIAL PRIMARY KEY,
+    total_capital INTEGER NOT NULL
+);
