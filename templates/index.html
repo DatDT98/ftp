@@ -1,0 +1,109 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funds Transfer Pricing</title>
+    <style>
+        .circle {
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Funds Transfer Pricing</h1>
+    <div>
+        <p>FTP Center</p>
+        <div id="ftpCircle" class="circle" style="width: {{ ftp.total_capital }}px; height: {{ ftp.total_capital }}px; background-color: lightblue;"></div>
+        <form id="ftpForm">
+            <label for="ftpValue">FTP Value:</label>
+            <input type="number" id="ftpValue" name="ftpValue" required>
+            <button type="button" onclick="updateFTP()">Update FTP</button>
+        </form>
+    </div>
+    <div>
+        <p>Units</p>
+        <div id="unitContainer">
+            {% for unit in units %}
+                <div class="circle unit" id="unit{{ unit.id }}" style="width: {{ unit.capital / 2 }}px; height: {{ unit.capital / 2 }}px; background-color: lightgreen;"></div>
+            {% endfor %}
+        </div>
+        <form id="unitForm">
+            <label for="unitName">Unit Name:</label>
+            <input type="text" id="unitName" name="unitName" required>
+            <label for="unitCapital">Unit Capital:</label>
+            <input type="number" id="unitCapital" name="unitCapital" required>
+            <button type="button" onclick="addUnit()">Add Unit</button>
+        </form>
+    </div>
+
+    <script>
+        function updateFTP() {
+            var ftpValue = parseFloat(document.getElementById("ftpValue").value);
+            fetch('/update_ftp_api', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    new_ftp_value: ftpValue,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Handle success, if needed
+                    console.log('FTP Updated successfully');
+                    document.getElementById("ftpCircle").style.width = ftpValue + "px";
+                    document.getElementById("ftpCircle").style.height = ftpValue + "px";
+                } else {
+                    // Handle failure, if needed
+                    console.error('Failed to update FTP');
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+
+        function addUnit() {
+            var unitName = document.getElementById("unitName").value;
+            var unitCapital = parseFloat(document.getElementById("unitCapital").value);
+            fetch('/add_unit_api', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: unitName,
+                    capital: unitCapital,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Handle success, if needed
+                    console.log('Unit Added successfully');
+                    var newUnitId = data.new_unit_id;
+                    document.getElementById("unit" + newUnitId).style.width = unitCapital / 2 + "px";
+                    document.getElementById("unit" + newUnitId).style.height = unitCapital / 2 + "px";
+
+                    // Update total capital of FTP
+                    var ftpCircle = document.getElementById("ftpCircle");
+                    var currentFtpValue = parseFloat(ftpCircle.style.width);
+                    var newFtpValue = currentFtpValue + unitCapital;
+                    ftpCircle.style.width = newFtpValue + "px";
+                    ftpCircle.style.height = newFtpValue + "px";
+                } else {
+                    // Handle failure, if needed
+                    console.error('Failed to add Unit');
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
